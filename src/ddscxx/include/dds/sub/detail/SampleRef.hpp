@@ -61,7 +61,10 @@ public:
 
     virtual ~SampleRef()
     {
-        ddsi_serdata_unref(reinterpret_cast<ddsi_serdata*>(data_));
+        if (data_ != nullptr)
+        {
+            ddsi_serdata_unref(reinterpret_cast<ddsi_serdata*>(data_));
+        }
     }
 
     SampleRef& operator=(const SampleRef& other)
@@ -76,6 +79,10 @@ public:
 public:
     const T& data() const
     {
+        if (data_ == nullptr)
+        {
+            throw dds::core::Error("Data is Null");
+        }
         return *data_->getT();
     }
 
