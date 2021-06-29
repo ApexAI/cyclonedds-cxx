@@ -20,7 +20,8 @@
 
 #include <vector>
 
-#include <org/eclipse/cyclonedds/topic/DataRepresentation.hpp>
+#include "org/eclipse/cyclonedds/topic/DataRepresentation.hpp"
+#include "org/eclipse/cyclonedds/topic/datatopic.hpp"
 
 struct ddsi_sertype;
 
