@@ -32,6 +32,8 @@
 #include "dds/ddsi/ddsi_shm_transport.h"
 #endif
 
+#define DISABLE_KEY_HASH 0
+
 constexpr size_t CDR_HEADER_SIZE = 4U;
 
 using org::eclipse::cyclonedds::core::cdr::endianness;
@@ -298,6 +300,7 @@ ddsi_serdata *serdata_from_ser(
     fragchain = fragchain->nextfrag;
   }
 
+#if DISABLE_KEY_HASH
   if (d->getT())
   {
     org::eclipse::cyclonedds::core::cdr::basic_cdr_stream str;
@@ -310,6 +313,7 @@ ddsi_serdata *serdata_from_ser(
     delete d;
     d = nullptr;
   }
+#endif
 
   return d;
 }
@@ -336,6 +340,7 @@ ddsi_serdata *serdata_from_ser_iov(
     off += n_bytes;
   }
 
+#if DISABLE_KEY_HASH
   T* ptr = d->getT();
   if (ptr) {
     org::eclipse::cyclonedds::core::cdr::basic_cdr_stream str;
@@ -346,6 +351,7 @@ ddsi_serdata *serdata_from_ser_iov(
     delete d;
     d = nullptr;
   }
+#endif
 
   return d;
 
@@ -425,9 +431,11 @@ ddsi_serdata *serdata_from_sample(
     goto failure;
 
   str.reset_position();
+#if DISABLE_KEY_HASH
   d->key_md5_hashed() = to_key(str, msg, d->key());
   d->setT(&msg);
   d->populate_hash();
+#endif
   return d;
 
 failure:
@@ -506,9 +514,11 @@ ddsi_serdata *serdata_to_untyped(const ddsi_serdata* dcmn)
   if (str.abort_status())
     goto failure;
 
+#if DISABLE_KEY_HASH
   d1->key_md5_hashed() = to_key(str, *t, d1->key());
   d1->hash = d->hash;
   d1->hash_populated = true;
+#endif
 
   return d1;
 
@@ -608,11 +618,13 @@ ddsi_serdata * serdata_from_iox_buffer(
       d->iox_subscriber = sub;
     }
 
+#if DISABLE_KEY_HASH
     // key handling
     org::eclipse::cyclonedds::core::cdr::basic_cdr_stream str;
     const auto& msg = *static_cast<const T*>(d->iox_chunk);
     d->key_md5_hashed() = to_key(str, msg, d->key());
     d->populate_hash();
+#endif
 
     return d;
   }
